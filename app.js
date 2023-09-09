@@ -1,4 +1,7 @@
 
+const tokenAbi = [ /* ... the token's ABI ... */ ];
+let tokenContract;
+
 let web3;
 let account;
 let contract;
@@ -504,8 +507,32 @@ async function fetchAndDisplayProfile() {
 // Check MetaMask connection
 window.onload = function() {
     checkMetaMaskConnection();
+    fetchAndDisplayTokenBalance();
 };
 
 document.addEventListener('DOMContentLoaded', (event) => {
   checkMetaMaskConnection();
+    fetchAndDisplayTokenBalance();
 });
+
+async function fetchAndDisplayTokenBalance() {
+    try {
+        const balance = await tokenContract.methods.balanceOf(account).call();
+        document.getElementById('balanceValue').innerText = web3.utils.fromWei(balance, 'ether');
+    } catch (error) {
+        console.error("Error fetching token balance:", error);
+    }
+}
+
+document.getElementById('transferButton').onclick = async () => {
+    const recipient = document.getElementById('recipientAddress').value;
+    const amount = web3.utils.toWei(document.getElementById('transferAmount').value, 'ether');
+
+    try {
+        await tokenContract.methods.transfer(recipient, amount).send({ from: account });
+        alert('Tokens transferred successfully!');
+        fetchAndDisplayTokenBalance();  // Update balance after transfer
+    } catch (error) {
+        console.error("Error transferring tokens:", error);
+    }
+};
