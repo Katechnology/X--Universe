@@ -1,8 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./XUniverseToken.sol"; // Assuming the XUniverseToken is in the same directory
+
 contract SimpleTwitter {
-    
+
+    XUniverseToken public token;
+
+    constructor(XUniverseToken _token) {
+        token = _token;
+    }
+
     struct Post {
         address author;
         string content;
@@ -36,6 +44,9 @@ contract SimpleTwitter {
         
         posts.push(newPost);
         emit NewPost(msg.sender, _content, block.timestamp);
+
+        // Reward user with tokens
+        token.transfer(msg.sender, 10 * 10 ** 18); // Rewarding 10 tokens as an example
     }
     
     function getPosts() public view returns (Post[] memory) {
